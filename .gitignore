@@ -1,0 +1,5 @@
+*.pkl
+*.pyc
+*.tfrecord
+.DS_Store
+*.pth
