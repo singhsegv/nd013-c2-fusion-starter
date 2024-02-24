@@ -141,7 +141,7 @@ def bev_from_pcl(lidar_pcl, configs):
 
     # step 3 : perform the same operation as in step 2 for the y-coordinates but make sure that no negative bev-coordinates occur
     # shifting the y coordinates by the minimum y value to move every point into the positive y-axis
-    lidar_pcl_cpy[:, 1] = np.asarray(((lidar_pcl_cpy[:, 1] - np.min(lidar_pcl_cpy[:, 1]))/ bev_discreet), dtype=np.uint32)
+    lidar_pcl_cpy[:, 1] = np.asarray(np.floor(lidar_pcl_cpy[:, 1] / bev_discreet) + (configs.bev_width + 1) / 2, dtype=np.uint32)
 
     # step 4 : visualize point-cloud using the function show_pcl from a previous task
     # show_pcl(lidar_pcl_cpy)
@@ -171,7 +171,7 @@ def bev_from_pcl(lidar_pcl, configs):
     ##          make sure that the intensity is scaled in such a way that objects of interest (e.g. vehicles) are clearly visible    
     ##          also, make sure that the influence of outliers is mitigated by normalizing intensity on the difference between the max. and min. value within the point cloud
     
-    nn_percentile = np.percentile(lidar_pcl_top[:, 3], 95) # Limiting the upper bound to 95th percentile to make vehicles clearly visible
+    nn_percentile = np.percentile(lidar_pcl_top[:, 3], 99) # Limiting the upper bound to 99th percentile to make vehicles clearly visible
     lidar_pcl_top[lidar_pcl_top[:, 3] > nn_percentile] = nn_percentile
     normalized_intensities = lidar_pcl_top[:, 3] / (nn_percentile - np.min(lidar_pcl_top[:, 3]))
 

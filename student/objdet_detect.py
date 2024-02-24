@@ -201,17 +201,22 @@ def detect_objects(input_bev_maps, model, configs):
             outputs['hm_cen'] = _sigmoid(outputs['hm_cen'])
             outputs['cen_offset'] = _sigmoid(outputs['cen_offset'])
 
-            detections = decode(outputs['hm_cen'], outputs['cen_offset'], outputs['direction'], 
+            detections = []
+            decoded_output = decode(outputs['hm_cen'], outputs['cen_offset'], outputs['direction'], 
                                 outputs['z_coor'], outputs['dim'], K=configs.K)
             
-            detections = detections.numpy().astype(np.float32)
-            detections = post_processing(detections, configs)
-            detections = detections[0]
-            print("break")
+            decoded_output = decoded_output.numpy().astype(np.float32)
+            decoded_output = post_processing(decoded_output, configs)
+            decoded_output = decoded_output[0]
+            
+            if len(decoded_output[1]) > 0:
+                # vehicles (class id 1) only
+                for item in decoded_output[1]:
+                    _, x, y, z, h, w, l, yaw = item.tolist()
+                    detections.append([1, x, y, z, h, w, l, yaw])
 
             #######
             ####### ID_S3_EX1-5 END #######     
-
             
 
     ####### ID_S3_EX2 START #######     
@@ -220,14 +225,36 @@ def detect_objects(input_bev_maps, model, configs):
     print("student task ID_S3_EX2")
     objects = [] 
 
-    ## step 1 : check whether there are any detections
+    # step 1 : check whether there are any detections
+    if len(detections) > 0:
+        # for our case, x and y ends up with same discreetization param
+        bev_discreet = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
 
-        ## step 2 : loop over all detections
-        
-            ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
-        
+        # step 2 : loop over all detections
+        for item in detections:
+            ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure     
+            x = item[2] * bev_discreet
+            y = item[1] * bev_discreet
+            y -= (configs.lim_y[1] - configs.lim_y[0]) / 2
+
+            w = item[5] * bev_discreet # w
+            l = item[6] * bev_discreet # l
+
+            item[1] = x
+            item[2] = y
+            item[5] = w
+            item[6] = l
+
+            # to be used for checking the config limits
+            z = item[3]
+           
             ## step 4 : append the current object to the 'objects' array
-        
+             # respecting the config x and y limits
+            if ((x >= configs.lim_x[0] and x <= configs.lim_x[1]) and
+                (y >= configs.lim_y[0] and y <= configs.lim_y[1]) and
+                (z >= configs.lim_z[0] and z <= configs.lim_z[1])):
+                objects.append(item)
+            
     #######
     ####### ID_S3_EX2 START #######   
     
