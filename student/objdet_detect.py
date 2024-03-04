@@ -100,6 +100,9 @@ def load_configs_model(model_name='darknet', configs=None):
     configs.gpu_idx = 0  # GPU index to use.
     configs.device = torch.device('cpu' if configs.no_cuda else 'cuda:{}'.format(configs.gpu_idx))
 
+    # Added for ID_S4_EX1 to handle the edict issue
+    configs.min_iou = 0.5
+
     return configs
 
 
