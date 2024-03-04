@@ -177,9 +177,6 @@ def bev_from_pcl(lidar_pcl, configs):
 
     intensity_map[np.int_(lidar_pcl_top[:, 0]), np.int_(lidar_pcl_top[:, 1])] = normalized_intensities
 
-    # TODO: How Plotting intensity values from the BEV map
-    # OpenCV value distribution matrix stuff
-
     ## step 5 : temporarily visualize the intensity map using OpenCV to make sure that vehicles separate well from the background
     # intensity_map = intensity_map * 255
     # intensity_map = intensity_map.astype(np.uint8)
@@ -233,6 +230,7 @@ def bev_from_pcl(lidar_pcl, configs):
     normalizedCounts = np.minimum(1.0, np.log(counts + 1) / np.log(64)) 
     density_map[np.int_(lidar_pcl_top[:, 0]), np.int_(lidar_pcl_top[:, 1])] = normalizedCounts
 
+    # Visualizing density map
     # density_map = density_map * 255
     # density_map = density_map.astype(np.uint8)
     # while True:

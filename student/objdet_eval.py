@@ -68,12 +68,12 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 det_polygon = Polygon(det_box_coords)
  
                 ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
-                # dist_x = math.sqrt((det_x - label_x)**2)
-                # dist_y = math.sqrt((det_y - label_y)**2)
-                # dist_z = math.sqrt((det_z - label_z)**2)
-                dist_x = (det_x - label_x).item()
-                dist_y = (det_y - label_y).item()
-                dist_z = det_z - label_z
+                dist_x = math.sqrt((det_x - label_x)**2)
+                dist_y = math.sqrt((det_y - label_y)**2)
+                dist_z = math.sqrt((det_z - label_z)**2)
+                # dist_x = (det_x - label_x).item()
+                # dist_y = (det_y - label_y).item()
+                # dist_z = det_z - label_z
 
                 # center_devs.append([dist_x, dist_y, dist_z])
                 
